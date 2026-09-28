@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install RGBDS (toy cartridge toolchain)
+        run: |
+          curl -sSfL https://github.com/gbdev/rgbds/releases/download/v1.0.4/rgbds-linux-x86_64.tar.xz -o /tmp/rgbds.tar.xz
+          sudo tar -xJf /tmp/rgbds.tar.xz -C /usr/local/bin rgbasm rgblink rgbfix
+          rgbasm --version
+      - run: make toy/toy.gb
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - run: pip install -r requirements.txt pytest
+      - run: pytest tests/ -q
+
+  extension:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+
+  shell:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y shellcheck
+      - run: shellcheck tests/e2e.sh
+      - run: bash -n tests/e2e.sh
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install RGBDS (toy cartridge toolchain)
+        run: |
+          curl -sSfL https://github.com/gbdev/rgbds/releases/download/v1.0.4/rgbds-linux-x86_64.tar.xz -o /tmp/rgbds.tar.xz
+          sudo tar -xJf /tmp/rgbds.tar.xz -C /usr/local/bin rgbasm rgblink rgbfix
+      - run: make toy/toy.gb
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+      - run: npm install -g @earendil-works/pi-coding-agent
+      - name: pi plays the toy cartridge
+        run: bash tests/e2e.sh

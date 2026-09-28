@@ -1,0 +1,18 @@
+{
+  "name": "pi-plays-pokemon",
+  "version": "0.1.0",
+  "private": true,
+  "description": "pi plays Pokemon: a pi coding agent extension that plays Game Boy games via screenshots and button presses",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-ai": "^0.87.1",
+    "@earendil-works/pi-coding-agent": "^0.87.1",
+    "@types/node": "^22",
+    "tsx": "^4",
+    "typescript": "^5"
+  }
+}
