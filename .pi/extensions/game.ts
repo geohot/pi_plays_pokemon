@@ -25,9 +25,6 @@ const EMU = process.env.EMU_URL ?? "http://127.0.0.1:8341";
 const IMAGE_SCALE = Number(process.env.PI_IMAGE_SCALE ?? 4);
 
 let requestLog = process.env.REQUEST_LOG ?? "";
-let steps = 0;
-let nudges = 0;
-let reported = false;
 let chain: Promise<unknown> = Promise.resolve();
 let ready: Promise<void> | null = null;
 
@@ -96,7 +93,7 @@ const BUTTONS = ["a", "b", "up", "down", "left", "right", "start", "select", "wa
 const look = defineTool({
   name: "look",
   label: "Look",
-  description: "Return the current Game Boy screen. Free; does not count as a step.",
+  description: "Return the current Game Boy screen without pressing anything.",
   parameters: Type.Object({}),
 
   async execute(_id, _params, _signal, _onUpdate, _ctx) {
@@ -121,53 +118,41 @@ const act = defineTool({
   label: "Act",
   description:
     "Press one Game Boy button held `frames` frames at 60fps, release it, let the game " +
-    "settle, repeat `presses` times, then return the new screen and how much it changed. " +
+    "settle, then return the new screen and how much it changed. " +
     'Use button "wait" to let `frames` frames pass without input. One act = one step.',
   parameters: Type.Object({
     button: Type.Union(
       BUTTONS.map((b) => Type.Literal(b)),
       { description: 'Button to press, or "wait" for no input' },
     ),
-    frames: Type.Integer({
-      description: "Hold duration in frames at 60fps (1-120).",
-      minimum: 1, maximum: 120,
-    }),
-    presses: Type.Integer({
-      description: "Separate presses of the button, each released and settled (1-4).",
-      minimum: 1, maximum: 4, default: 1,
-    }),
+    frames: Type.Optional(Type.Integer({
+      description: "Hold duration in frames at 60fps (1-120), default 8.",
+      minimum: 1, maximum: 120, default: 8,
+    })),
   }),
 
   async execute(_id, params, _signal, _onUpdate, _ctx) {
     const run = chain.then(async () => {
       await ensureEmu();
-      const body = {
-        button: params.button === "wait" ? null : params.button,
-        frames: params.frames,
-        presses: params.presses ?? 1,
-      };
       const res = await fetch(`${EMU}/act`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+          button: params.button === "wait" ? null : params.button,
+          frames: params.frames ?? 8,
+        }),
       });
       const entry = await res.json() as {
-        step: number; button: string | null; frames: number; presses: number; changed: number;
-        error?: string;
+        step: number; button: string | null; frames: number; changed: number; error?: string;
       };
       if (!res.ok || entry.error) throw new Error(`emulator rejected act: ${entry.error ?? res.status}`);
-      steps += 1;
-      nudges = 0;
-      const pct = (entry.changed * 100).toFixed(1);
-      let summary =
-        `step ${entry.step}: ${entry.button ?? "wait"} ${entry.frames}f x${entry.presses}, ` +
-        `screen change ${pct}%`;
       logRequest({ kind: "act", ...entry });
-      const content: Array<{ type: "text"; text: string } | { type: "image"; data: string; mimeType: string }> = [
-        { type: "text", text: summary },
-      ];
-      content.push(await screen());
-      return { content, details: entry };
+      const pct = (entry.changed * 100).toFixed(1);
+      const summary = `step ${entry.step}: ${entry.button ?? "wait"} ${entry.frames}f, screen change ${pct}%`;
+      return {
+        content: [{ type: "text" as const, text: summary }, await screen()],
+        details: entry,
+      };
     });
     chain = run.catch(() => undefined);
     return run;
@@ -193,10 +178,8 @@ const report = defineTool({
       await ensureEmu();
       const s = await status();
       const outcome = {
-        step: s.step, done: params.done, note: params.note,
-        steps_used: steps, ts: new Date().toISOString(),
+        step: s.step, done: params.done, note: params.note, ts: new Date().toISOString(),
       };
-      reported = true;
       logRequest({ kind: "report", ...outcome });
       try {
         writeFileSync(join(dirname(requestLog), "result.json"),
@@ -222,34 +205,9 @@ export default function (pi: ExtensionAPI) {
   pi.registerTool(report);
 
   pi.on("session_start", () => {
-    steps = 0;
-    nudges = 0;
-    reported = false;
+    pi.setActiveTools(["look", "act", "report"]);
     chain = Promise.resolve();
     ready = null;
     requestLog = process.env.REQUEST_LOG ?? "";
-  });
-
-  // Keep the run alive when the model settles without a tool call (e.g. a
-  // runaway reasoning reply with no action).
-  pi.on("agent_before_settle", (event) => {
-    if (event.outcome === "aborted" || reported || nudges >= 5) return undefined;
-    const messages = event.context.contextMessages as Array<{ role?: string; content?: Array<{ type?: string }> }>;
-    const last = messages[messages.length - 1];
-    if (!last || last.role !== "assistant") return undefined;
-    if ((last.content ?? []).some((c) => c.type === "toolCall")) return undefined;
-    nudges += 1;
-    logRequest({ kind: "nudge", n: nudges });
-    return {
-      entries: [{
-        type: "custom_message",
-        customType: "continue",
-        display: false,
-        content: "No tool call was made. Reply with ONLY a tool call now - no more reasoning: " +
-          "act() to keep playing, or report(done, note) with the verdict you have already " +
-          "formed. Do not reconsider it again.",
-      }],
-      continue: true,
-    };
   });
 }

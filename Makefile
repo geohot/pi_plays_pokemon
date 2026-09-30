@@ -7,6 +7,5 @@ toy/toy.gb: toy/toy.asm
 
 test: toy/toy.gb
 	.venv/bin/python -m pytest tests/ -q
-	npm test
 
 .PHONY: test

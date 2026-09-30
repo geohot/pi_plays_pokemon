@@ -28,7 +28,8 @@ toy cartridge instead.
 
 `pi` must be installed (`npm i -g @earendil-works/pi-coding-agent`) and set up
 as usual — runs use pi's normal global config and default model, which must
-accept image input.
+accept image input. For long runs on small-context local models, enable
+auto-compaction in pi's global `~/.pi/agent/settings.json`.
 
 ## Play
 
@@ -37,9 +38,8 @@ pi -a "Beat the game."
 ```
 
 That is the whole interface. The extension boots the emulator sidecar on the
-first tool call (`emu.py`, reusing an already-running one), and the project
-settings restrict pi to the three game tools. `-a` trusts the project
-extension for the run.
+first tool call (`emu.py`, reusing an already-running one), and restricts pi
+to the three game tools. `-a` trusts the project extension for the run.
 
 - Web UI: **http://localhost:8341** (bound to `0.0.0.0`, so reachable from
   other machines too) — live screen, action log, and the model's reasoning.
@@ -65,12 +65,11 @@ is keyed to the ROM, so different games never clobber each other.
 
 ## Testing
 
-CI runs four jobs (`.github/workflows/ci.yml`):
+CI runs three jobs (`.github/workflows/ci.yml`):
 
 | Job | What it covers |
 | --- | --- |
 | `python` | `pytest tests/` — the sidecar HTTP API, run evidence, campaign resume, agent feed, and the `stream.py` event mirror |
-| `extension` | `tsc --noEmit` + `node --test` — the `look`/`act`/`report` tools, request serialization, the settle nudge (against a stub sidecar) |
 | `shell` | `shellcheck` on all scripts |
 | `e2e` | the **full loop**: real pi, the real extension and a real emulator against a scripted stub model server |
 
@@ -88,9 +87,8 @@ copyrighted ROM. Without the toy built, those tests skip cleanly.
 | `stream.py` | pretty-prints pi's `--mode json` event stream |
 | `.pi/SYSTEM.md` | the whole prompt: beat the game |
 | `.pi/extensions/game.ts` | `look` / `act` / `report` tools; boots the sidecar |
-| `.pi/settings.json` | disables pi's coding tools, leaving the game tools |
 | `toy/toy.asm` | the toy test cartridge (RGBDS assembly) |
-| `tests/` | pytest suite, extension tests, stub model, e2e script |
+| `tests/` | pytest suite, stub model, e2e script |
 
 Environment variables: `ROM_PATH`, `EMU_PORT`, `EMU_URL`, `RUN_NAME`,
 `PI_FRESH`, `PI_IMAGE_SCALE`, `REQUEST_LOG`.

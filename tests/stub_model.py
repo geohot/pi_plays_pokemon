@@ -6,8 +6,8 @@ Speaks just enough of the streaming chat-completions API for pi's
 request, keyed on how many tool results the conversation already contains:
 
   0 tool results -> look()
-  1              -> act(right)
-  2              -> act(a)          (palette flash: a big screen change)
+  1              -> act("right")
+  2              -> act("a")     (palette flash: a big screen change)
   3+             -> report(done=true)
 
 Usage: stub_model.py [port]  (default 8398)
@@ -18,8 +18,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 SCRIPT = [
     ("look", {}),
-    ("act", {"button": "right", "frames": 30, "presses": 1}),
-    ("act", {"button": "a", "frames": 16, "presses": 1}),
+    ("act", {"button": "right", "frames": 30}),
+    ("act", {"button": "a"}),
     ("report", {"done": True, "note": "stub model reached its target"}),
 ]
 
