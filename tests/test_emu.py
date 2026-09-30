@@ -38,15 +38,15 @@ def test_screen_png_scales(sidecar):
 
 def test_act_buttons_and_validation(sidecar):
     for button in ["a", "b", "start", "select", "up", "down", "left", "right", None]:
-        status, entry = post(sidecar, "/act", {"button": button, "frames": 8})
+        status, entry = post(sidecar, "/act", {"button": button, "frames": 8, "presses": 2})
         assert status == 200
         assert entry["button"] == button
         if button is None:
             assert entry["emulated_frames"] == 8
         else:
-            assert entry["emulated_frames"] == 8 + emu.SETTLE_FRAMES
+            assert entry["emulated_frames"] == 2 * (8 + emu.SETTLE_FRAMES)
 
-    for bad in [{"button": "turbo"}, {"frames": 0}, {"frames": 121}]:
+    for bad in [{"button": "turbo"}, {"frames": 0}, {"frames": 121}, {"presses": 5}]:
         status, body = post(sidecar, "/act", bad)
         assert status == 400
         assert "error" in body

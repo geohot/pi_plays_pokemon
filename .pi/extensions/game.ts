@@ -129,6 +129,10 @@ const act = defineTool({
       description: "Hold duration in frames at 60fps (1-120), default 8.",
       minimum: 1, maximum: 120, default: 8,
     })),
+    presses: Type.Optional(Type.Integer({
+      description: "Tap the button this many times (1-4), default 1. For mashing through dialogue.",
+      minimum: 1, maximum: 4, default: 1,
+    })),
   }),
 
   async execute(_id, params, _signal, _onUpdate, _ctx) {
@@ -140,15 +144,16 @@ const act = defineTool({
         body: JSON.stringify({
           button: params.button === "wait" ? null : params.button,
           frames: params.frames ?? 8,
+          presses: params.presses ?? 1,
         }),
       });
       const entry = await res.json() as {
-        step: number; button: string | null; frames: number; changed: number; error?: string;
+        step: number; button: string | null; frames: number; presses: number; changed: number; error?: string;
       };
       if (!res.ok || entry.error) throw new Error(`emulator rejected act: ${entry.error ?? res.status}`);
       logRequest({ kind: "act", ...entry });
       const pct = (entry.changed * 100).toFixed(1);
-      const summary = `step ${entry.step}: ${entry.button ?? "wait"} ${entry.frames}f, screen change ${pct}%`;
+      const summary = `step ${entry.step}: ${entry.button ?? "wait"} ${entry.frames}f x${entry.presses}, screen change ${pct}%`;
       return {
         content: [{ type: "text" as const, text: summary }, await screen()],
         details: entry,

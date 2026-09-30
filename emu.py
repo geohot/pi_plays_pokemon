@@ -8,7 +8,7 @@ Endpoints (all interfaces, port 8341 by default):
   GET  /log           json: recorded actions for the current run
   GET  /agent         json: the agent's live reasoning/text/action feed
   POST /agent         {kind, text}: append to the agent feed (stream.py posts)
-  POST /act           {"button": "a"|"b"|...|null, "frames": 1..120}
+  POST /act           {"button": "a"|"b"|...|null, "frames": 1..120, "presses": 1..4}
   POST /reset         fresh boot; optional ?name=RUN-ID for the evidence folder
 
 Pixels in, button presses out. No game state is read from the emulator.
@@ -126,29 +126,35 @@ def reset(name=None, fresh=False):
         return {"run": _run_dir.name, "step": 0}
 
 
-def act(button, frames):
+def act(button, frames, presses=1):
     global _step
     if button is not None and button not in BUTTONS:
         raise ValueError(f"bad button {button!r}")
     frames = int(frames)
+    presses = int(presses)
     if not 1 <= frames <= 120:
         raise ValueError("frames must be 1..120")
+    if not 1 <= presses <= 4:
+        raise ValueError("presses must be 1..4")
     with _lock:
         before = _frame()
+        held = 0
         if button is None:
             _emu.tick(frames, render=True, sound=False)
             held = frames
         else:
-            _emu.button_press(button)
-            try:
-                _emu.tick(frames, render=True, sound=False)
-            finally:
-                _emu.button_release(button)
-            _emu.tick(SETTLE_FRAMES, render=True, sound=False)
-            held = frames + SETTLE_FRAMES
+            for _ in range(presses):
+                _emu.button_press(button)
+                try:
+                    _emu.tick(frames, render=True, sound=False)
+                    held += frames
+                finally:
+                    _emu.button_release(button)
+                _emu.tick(SETTLE_FRAMES, render=True, sound=False)
+                held += SETTLE_FRAMES
         after = _frame()
         _step += 1
-        entry = {"step": _step, "button": button, "frames": frames,
+        entry = {"step": _step, "button": button, "frames": frames, "presses": presses,
                  "emulated_frames": held, "changed": round(_changed(before, after), 4),
                  "ts": time.time()}
         if _campaign:
@@ -225,7 +231,7 @@ class Handler(BaseHTTPRequestHandler):
             elif url.path == "/act":
                 n = int(self.headers.get("Content-Length", 0))
                 body = json.loads(self.rfile.read(n) or b"{}")
-                self._json(act(body.get("button"), body.get("frames", 8)))
+                self._json(act(body.get("button"), body.get("frames", 8), body.get("presses", 1)))
             else:
                 self._json({"error": "not found"}, 404)
         except Exception as exc:
@@ -266,12 +272,12 @@ async function tick() {
     const s = await (await fetch("/status")).json();
     document.getElementById("status").textContent =
       `run ${s.run} - step ${s.step} - ${s.campaign ? "RESUMED campaign state" : "fresh boot"}` + (s.last
-        ? ` - last: ${s.last.button ?? "wait"} ${s.last.frames}f (change ${(s.last.changed*100).toFixed(1)}%)`
+        ? ` - last: ${s.last.button ?? "wait"} ${s.last.frames}f x${s.last.presses} (change ${(s.last.changed*100).toFixed(1)}%)`
         : "");
     document.getElementById("screen").src = "/screen.png?scale=3&t=" + Date.now();
     const l = await (await fetch("/log")).json();
     const rows = l.actions.slice(-200).reverse().map(a =>
-      `<tr><td>${a.step}</td><td>${a.button ?? "wait"}</td><td>${a.frames}f</td><td>${(a.changed*100).toFixed(1)}%</td></tr>`);
+      `<tr><td>${a.step}</td><td>${a.button ?? "wait"}</td><td>${a.frames}f x${a.presses}</td><td>${(a.changed*100).toFixed(1)}%</td></tr>`);
     document.getElementById("log").innerHTML =
       "<table><tr><th>step</th><th>button</th><th>hold</th><th>change</th></tr>" + rows.join("") + "</table>";
     const ag = await (await fetch("/agent")).json();
