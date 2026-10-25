@@ -328,11 +328,7 @@ PAGE = """<!doctype html>
 <script>
 async function tick() {
   try {
-    const s = await (await fetch("/status")).json();
-    document.getElementById("status").textContent =
-      `run ${s.run} - step ${s.step} - ${s.campaign ? "RESUMED campaign state" : "fresh boot"}` + (s.last
-        ? ` - last: ${s.last.actions.join(" ") || "(no presses)"} (${s.last.presses} presses, change ${(s.last.changed*100).toFixed(1)}%)`
-        : "");
+    document.getElementById("status").textContent = "";   // online; only errors print here
     document.getElementById("screen").src = "/screen.png?scale=3&t=" + Date.now();
     const l = await (await fetch("/log")).json();
     const rows = l.actions.slice(-200).reverse().map(a =>
