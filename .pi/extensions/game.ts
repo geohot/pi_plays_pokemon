@@ -14,7 +14,7 @@
  *   PI_IMAGE_SCALE  screenshot scale sent to the model (default 4)
  */
 import { spawn } from "node:child_process";
-import { appendFileSync, existsSync, mkdirSync, openSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, openSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Type } from "@earendil-works/pi-ai";
@@ -23,6 +23,7 @@ import { defineTool, type ExtensionAPI } from "@earendil-works/pi-coding-agent";
 const ROOT = join(fileURLToPath(import.meta.url), "..", "..", "..");
 const EMU = process.env.EMU_URL ?? "http://127.0.0.1:8341";
 const IMAGE_SCALE = Number(process.env.PI_IMAGE_SCALE ?? 4);
+const ACT_API = 2; // emu.py's action API generation, reported by /status
 
 let requestLog = process.env.REQUEST_LOG ?? "";
 let chain: Promise<unknown> = Promise.resolve();
@@ -38,11 +39,55 @@ async function up(): Promise<boolean> {
   }
 }
 
+async function status(): Promise<{ step: number; api?: number }> {
+  const res = await fetch(`${EMU}/status`);
+  return await res.json() as { step: number; api?: number };
+}
+
+// A sidecar still running an older action API is worse than one that is down:
+// its /act ignores {"actions": [...]} and waits instead, so every press the
+// model makes silently becomes a no-op. When we own the process (runs/emu.pid
+// still pointing at our emu.py), replace it; otherwise fail loudly.
+async function stopOwnedSidecar(): Promise<boolean> {
+  let pid: number;
+  try {
+    pid = Number(readFileSync(join(ROOT, "runs", "emu.pid"), "utf8").trim());
+  } catch {
+    return false;
+  }
+  if (!Number.isInteger(pid) || pid <= 1) return false;
+  try {
+    // /proc is Linux-only; a missing entry or a recycled pid must not be killed.
+    const argv = readFileSync(`/proc/${pid}/cmdline`, "utf8").split("\0");
+    if (!argv.some((a) => a === "emu.py" || a.endsWith("/emu.py"))) return false;
+  } catch {
+    return false;
+  }
+  try {
+    process.kill(pid, "SIGTERM");
+  } catch {
+    return false;
+  }
+  for (let i = 0; i < 50 && (await up()); i++) await sleep(200);
+  return !(await up());
+}
+
 // First tool call in a session starts the sidecar if needed and resets it
 // into this session's run directory. Everything the model does lands under
 // runs/<run>/.
 function ensureEmu(): Promise<void> {
   ready ??= (async () => {
+    if (await up()) {
+      const s = await status();
+      if (s.api !== ACT_API) {
+        const replaced = await stopOwnedSidecar();
+        if (!replaced) {
+          throw new Error(`emulator sidecar at ${EMU} runs action API ${s.api ?? 1}, ` +
+            `expected ${ACT_API}: its /act ignores {"actions": [...]} and every press ` +
+            `becomes a silent no-op. Restart the sidecar and rerun.`);
+        }
+      }
+    }
     if (!(await up())) {
       mkdirSync(join(ROOT, "runs"), { recursive: true });
       const fd = openSync(join(ROOT, "runs", "emu.log"), "a");
@@ -83,12 +128,7 @@ async function screen(): Promise<{ type: "image"; data: string; mimeType: string
   return { type: "image", data, mimeType: "image/png" };
 }
 
-async function status(): Promise<{ step: number }> {
-  const res = await fetch(`${EMU}/status`);
-  return await res.json() as { step: number };
-}
-
-const BUTTONS = ["a", "b", "up", "down", "left", "right", "start", "select", "wait"] as const;
+const BUTTONS = ["up", "down", "left", "right", "a", "b", "start", "select"] as const;
 
 const look = defineTool({
   name: "look",
@@ -117,22 +157,14 @@ const act = defineTool({
   name: "act",
   label: "Act",
   description:
-    "Press one Game Boy button held `frames` frames at 60fps, release it, let the game " +
-    "settle, then return the new screen and how much it changed. " +
-    'Use button "wait" to let `frames` frames pass without input. One act = one step.',
+    "Press up to six Game Boy buttons, in order, one press each, then return " +
+    "the new screen and how much it changed. An empty list presses nothing. " +
+    "One act = one step.",
   parameters: Type.Object({
-    button: Type.Union(
-      BUTTONS.map((b) => Type.Literal(b)),
-      { description: 'Button to press, or "wait" for no input' },
+    actions: Type.Array(
+      Type.Union(BUTTONS.map((b) => Type.Literal(b))),
+      { minItems: 0, maxItems: 6, description: "Buttons to press, in order" },
     ),
-    frames: Type.Optional(Type.Integer({
-      description: "Hold duration in frames at 60fps (1-120), default 8.",
-      minimum: 1, maximum: 120, default: 8,
-    })),
-    presses: Type.Optional(Type.Integer({
-      description: "Tap the button this many times (1-4), default 1. For mashing through dialogue.",
-      minimum: 1, maximum: 4, default: 1,
-    })),
   }),
 
   async execute(_id, params, _signal, _onUpdate, _ctx) {
@@ -141,19 +173,21 @@ const act = defineTool({
       const res = await fetch(`${EMU}/act`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          button: params.button === "wait" ? null : params.button,
-          frames: params.frames ?? 8,
-          presses: params.presses ?? 1,
-        }),
+        body: JSON.stringify({ actions: params.actions }),
       });
       const entry = await res.json() as {
-        step: number; button: string | null; frames: number; presses: number; changed: number; error?: string;
+        step: number; actions: string[]; presses: number; emulated_frames: number;
+        changed: number; error?: string;
       };
       if (!res.ok || entry.error) throw new Error(`emulator rejected act: ${entry.error ?? res.status}`);
+      if (!Array.isArray(entry.actions)) {
+        throw new Error("emulator sidecar is outdated: /act replied without an actions list " +
+          "(restart the sidecar so /act speaks {\"actions\": [...]})");
+      }
       logRequest({ kind: "act", ...entry });
       const pct = (entry.changed * 100).toFixed(1);
-      const summary = `step ${entry.step}: ${entry.button ?? "wait"} ${entry.frames}f x${entry.presses}, screen change ${pct}%`;
+      const summary = `step ${entry.step}: ${entry.actions.join(" ") || "(no presses)"}` +
+        ` (${entry.presses} press${entry.presses === 1 ? "" : "es"}), screen change ${pct}%`;
       return {
         content: [{ type: "text" as const, text: summary }, await screen()],
         details: entry,

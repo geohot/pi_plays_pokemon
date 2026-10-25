@@ -60,12 +60,12 @@ def test_text_deltas_and_tool_result():
         delta("text_delta", "moving right"),
         {"type": "message_end"},
         {"type": "tool_execution_end", "toolName": "act",
-         "result": {"content": [{"type": "text", "text": "step 5: right 16f x1\nmore"}]}},
+         "result": {"content": [{"type": "text", "text": "step 5: up up a (3 presses), screen change 12.0%\nmore"}]}},
     ])
     assert proc.returncode == 0
     kinds = [(p["kind"], p["text"]) for p in posts]
     assert ("text", "moving right") in kinds
-    assert ("result", "act: step 5: right 16f x1") in kinds  # first line only
+    assert ("result", "act: step 5: up up a (3 presses), screen change 12.0%") in kinds  # first line only
 
 
 def test_garbage_lines_are_skipped():

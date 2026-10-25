@@ -8,6 +8,12 @@ the action log, and the model's streaming reasoning.
 Nothing about the game is hardcoded: the prompt is just "beat the game", and
 the model's own `report()` verdict decides the result.
 
+The action API matches PokéBench's RVB category: `act` takes a list of up to
+six buttons (`up down left right a b start select`), one press each, in order.
+An empty list is a legal turn that presses nothing. There is no hold duration,
+no mash count, no wait button - one entry in the list is one press, which keeps
+runs on the two harnesses comparable.
+
 ## Status
 
 The harness works and is fully tested (see below), but current open-weight

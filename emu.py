@@ -8,7 +8,8 @@ Endpoints (all interfaces, port 8341 by default):
   GET  /log           json: recorded actions for the current run
   GET  /agent         json: the agent's live reasoning/text/action feed
   POST /agent         {kind, text}: append to the agent feed (stream.py posts)
-  POST /act           {"button": "a"|"b"|...|null, "frames": 1..120, "presses": 1..4}
+  POST /act           {"actions": ["up", "a", ...]} - up to six buttons, one
+                      press each (PokéBench RVB semantics; an empty list presses nothing)
   POST /reset         fresh boot; optional ?name=RUN-ID for the evidence folder
 
 Pixels in, button presses out. No game state is read from the emulator.
@@ -38,8 +39,12 @@ ROM = Path(os.environ.get("ROM_PATH", ROOT / "roms" / "pokemon_red.gb"))
 RUNS = ROOT / "runs"
 PORT = int(os.environ.get("EMU_PORT", "8341"))
 SETTLE_FRAMES = 96          # released frames after each press (matches proven runs)
+PRESS_FRAMES = 8            # frames a button is held per press (PokéBench press timing)
+MAX_PRESSES = 6             # buttons per act call (PokéBench RVB_MAX_PRESSES)
+API_VERSION = 2              # action API generation; /status reports it so the extension
+                            # can detect (and replace) a sidecar from before the actions API
 BOOT_FRAMES = 240           # frames advanced on a fresh boot before first capture
-BUTTONS = {"a", "b", "start", "select", "up", "down", "left", "right"}
+BUTTONS = ("up", "down", "left", "right", "a", "b", "start", "select")
 
 _lock = threading.Lock()
 _emu = None
@@ -126,35 +131,36 @@ def reset(name=None, fresh=False):
         return {"run": _run_dir.name, "step": 0}
 
 
-def act(button, frames, presses=1):
+def act(actions):
+    """Press up to six buttons, in order, one press each (PokéBench RVB's action API).
+
+    An empty list is a legal call: a step spent pressing nothing. Anything else -
+    a non-list, an unknown button, more than six presses - is rejected without
+    touching the emulator, so the caller can retry the same turn.
+    """
     global _step
-    if button is not None and button not in BUTTONS:
-        raise ValueError(f"bad button {button!r}")
-    frames = int(frames)
-    presses = int(presses)
-    if not 1 <= frames <= 120:
-        raise ValueError("frames must be 1..120")
-    if not 1 <= presses <= 4:
-        raise ValueError("presses must be 1..4")
+    if not isinstance(actions, list):
+        raise ValueError("actions must be a list of button names")
+    if len(actions) > MAX_PRESSES:
+        raise ValueError(f"too many presses: {len(actions)} (limit is {MAX_PRESSES})")
+    for button in actions:
+        if button not in BUTTONS:
+            raise ValueError(f"bad button {button!r}")
     with _lock:
         before = _frame()
         held = 0
-        if button is None:
-            _emu.tick(frames, render=True, sound=False)
-            held = frames
-        else:
-            for _ in range(presses):
-                _emu.button_press(button)
-                try:
-                    _emu.tick(frames, render=True, sound=False)
-                    held += frames
-                finally:
-                    _emu.button_release(button)
-                _emu.tick(SETTLE_FRAMES, render=True, sound=False)
-                held += SETTLE_FRAMES
+        for button in actions:
+            _emu.button_press(button)
+            try:
+                _emu.tick(PRESS_FRAMES, render=True, sound=False)
+                held += PRESS_FRAMES
+            finally:
+                _emu.button_release(button)
+            _emu.tick(SETTLE_FRAMES, render=True, sound=False)
+            held += SETTLE_FRAMES
         after = _frame()
         _step += 1
-        entry = {"step": _step, "button": button, "frames": frames, "presses": presses,
+        entry = {"step": _step, "actions": list(actions), "presses": len(actions),
                  "emulated_frames": held, "changed": round(_changed(before, after), 4),
                  "ts": time.time()}
         if _campaign:
@@ -192,6 +198,7 @@ class Handler(BaseHTTPRequestHandler):
             elif url.path == "/status":
                 with _lock:
                     self._json({"run": _run_dir.name if _run_dir else None, "step": _step,
+                                "api": API_VERSION,
                                 "mode": "resume" if _campaign else "fresh",
                                 "campaign": _campaign_path().exists(),
                                 "last": _actions[-1] if _actions else None})
@@ -231,7 +238,7 @@ class Handler(BaseHTTPRequestHandler):
             elif url.path == "/act":
                 n = int(self.headers.get("Content-Length", 0))
                 body = json.loads(self.rfile.read(n) or b"{}")
-                self._json(act(body.get("button"), body.get("frames", 8), body.get("presses", 1)))
+                self._json(act(body.get("actions")))
             else:
                 self._json({"error": "not found"}, 404)
         except Exception as exc:
@@ -272,14 +279,14 @@ async function tick() {
     const s = await (await fetch("/status")).json();
     document.getElementById("status").textContent =
       `run ${s.run} - step ${s.step} - ${s.campaign ? "RESUMED campaign state" : "fresh boot"}` + (s.last
-        ? ` - last: ${s.last.button ?? "wait"} ${s.last.frames}f x${s.last.presses} (change ${(s.last.changed*100).toFixed(1)}%)`
+        ? ` - last: ${s.last.actions.join(" ") || "(no presses)"} (${s.last.presses} presses, change ${(s.last.changed*100).toFixed(1)}%)`
         : "");
     document.getElementById("screen").src = "/screen.png?scale=3&t=" + Date.now();
     const l = await (await fetch("/log")).json();
     const rows = l.actions.slice(-200).reverse().map(a =>
-      `<tr><td>${a.step}</td><td>${a.button ?? "wait"}</td><td>${a.frames}f x${a.presses}</td><td>${(a.changed*100).toFixed(1)}%</td></tr>`);
+      `<tr><td>${a.step}</td><td>${a.actions.join(" ") || "—"}</td><td>${a.presses}</td><td>${(a.changed*100).toFixed(1)}%</td></tr>`);
     document.getElementById("log").innerHTML =
-      "<table><tr><th>step</th><th>button</th><th>hold</th><th>change</th></tr>" + rows.join("") + "</table>";
+      "<table><tr><th>step</th><th>buttons</th><th>presses</th><th>change</th></tr>" + rows.join("") + "</table>";
     const ag = await (await fetch("/agent")).json();
     const box = document.getElementById("agent");
     const near = box.scrollHeight - box.scrollTop - box.clientHeight < 40;

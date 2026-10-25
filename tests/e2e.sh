@@ -2,6 +2,10 @@
 # End-to-end: real pi + the real game extension + the real emulator sidecar,
 # playing the toy cartridge with a scripted stub model server.
 #
+# The emulator port is first occupied by a sidecar frozen at the pre-actions
+# API (tests/old_sidecar.py): the extension must detect it via /status and
+# replace the process it owns before play starts.
+#
 # Requires: pi on PATH, .venv with requirements.txt installed, toy/toy.gb
 # built (make toy/toy.gb). Everything model-side is fake; everything else
 # is the production code path.
@@ -20,7 +24,13 @@ AGENT_DIR="$(mktemp -d)"
 
 python3 tests/stub_model.py "$STUB_PORT" &
 STUB_PID=$!
-trap 'kill $STUB_PID 2>/dev/null || true
+# A stale sidecar from before the actions API, named emu.py so the
+# extension's ownership check (/proc cmdline) recognises it as its own.
+OLD="$AGENT_DIR/emu.py"
+cp tests/old_sidecar.py "$OLD"
+python3 "$OLD" "$EMU_PORT" "$PWD/runs/emu.pid" &
+OLD_PID=$!
+trap 'kill $STUB_PID $OLD_PID 2>/dev/null || true
       [ -f runs/emu.pid ] && kill "$(cat runs/emu.pid)" 2>/dev/null
       rm -rf "$AGENT_DIR" "runs/$RUN"' EXIT
 
@@ -68,8 +78,8 @@ result = json.loads((run / "result.json").read_text())
 assert result["done"] is True, f"stub did not report done: {result}"
 
 actions = [json.loads(line) for line in (run / "actions.jsonl").read_text().splitlines()]
-buttons = [a["button"] for a in actions]
-assert buttons == ["right", "a"], f"unexpected action sequence: {buttons}"
+buttons = [a["actions"] for a in actions]
+assert buttons == [["right"], ["a"]], f"unexpected action sequence: {buttons}"
 assert actions[0]["changed"] > 0, "the right press changed no pixels"
 assert actions[1]["changed"] > 0.9, "the A press should flash the screen"
 
@@ -84,3 +94,15 @@ assert [e["kind"] for e in log] == ["act", "act", "report"], f"unexpected reques
 
 print("[e2e] PASS: pi played the toy cartridge (look, right, A, report done)")
 EOF
+
+# The stale pre-actions sidecar must have been detected and replaced: dead,
+# and the pid file now points at the sidecar the extension spawned.
+if kill -0 "$OLD_PID" 2>/dev/null; then
+  echo "[e2e] FAIL: the old sidecar (pid $OLD_PID) is still running" >&2
+  exit 1
+fi
+[ "$(cat runs/emu.pid)" != "$OLD_PID" ] || {
+  echo "[e2e] FAIL: runs/emu.pid still points at the old sidecar" >&2
+  exit 1
+}
+echo "[e2e] PASS: stale pre-actions sidecar was detected and replaced"

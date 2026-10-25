@@ -22,6 +22,7 @@ def test_status(sidecar):
     assert body["step"] == 0
     assert body["mode"] == "fresh"
     assert body["last"] is None
+    assert body["api"] == emu.API_VERSION   # the extension checks this to catch stale sidecars
 
 
 def test_screen_png_scales(sidecar):
@@ -37,28 +38,34 @@ def test_screen_png_scales(sidecar):
 
 
 def test_act_buttons_and_validation(sidecar):
-    for button in ["a", "b", "start", "select", "up", "down", "left", "right", None]:
-        status, entry = post(sidecar, "/act", {"button": button, "frames": 8, "presses": 2})
-        assert status == 200
-        assert entry["button"] == button
-        if button is None:
-            assert entry["emulated_frames"] == 8
-        else:
-            assert entry["emulated_frames"] == 2 * (8 + emu.SETTLE_FRAMES)
+    buttons = ["up", "down", "left", "right", "a", "b", "start", "select"]
+    status, entry = post(sidecar, "/act", {"actions": buttons[:6]})
+    assert status == 200
+    assert entry["actions"] == buttons[:6]
+    assert entry["presses"] == 6
+    assert entry["emulated_frames"] == 6 * (emu.PRESS_FRAMES + emu.SETTLE_FRAMES)
 
-    for bad in [{"button": "turbo"}, {"frames": 0}, {"frames": 121}, {"presses": 5}]:
+    # an empty list is a legal turn that presses nothing (PokéBench RVB)
+    status, entry = post(sidecar, "/act", {"actions": []})
+    assert status == 200
+    assert entry["presses"] == 0
+    assert entry["emulated_frames"] == 0
+    assert entry["changed"] == 0.0
+
+    for bad in [{"actions": "up"}, {"actions": ["turbo"]}, {"actions": ["up"] * 7},
+                {"button": "up", "frames": 8}, {}]:
         status, body = post(sidecar, "/act", bad)
         assert status == 400
         assert "error" in body
 
 
 def test_act_advances_steps_and_logs(sidecar, tmp_path):
-    post(sidecar, "/act", {"button": "up", "frames": 8})
-    post(sidecar, "/act", {"button": None, "frames": 30})
+    post(sidecar, "/act", {"actions": ["up"]})
+    post(sidecar, "/act", {"actions": []})
 
     status, body = get_json(sidecar, "/log")
     assert body["step"] == 2
-    assert [a["button"] for a in body["actions"]] == ["up", None]
+    assert [a["actions"] for a in body["actions"]] == [["up"], []]
 
     run_dir = tmp_path / "runs" / "test"
     lines = (run_dir / "actions.jsonl").read_text().strip().splitlines()
@@ -66,22 +73,23 @@ def test_act_advances_steps_and_logs(sidecar, tmp_path):
     assert (run_dir / "frames" / "step-002.png").exists()
 
     status, body = get_json(sidecar, "/status")
-    assert body["last"]["button"] is None
+    assert body["last"]["actions"] == []
 
 
 def test_static_rom_reports_zero_change(sidecar):
-    _, entry = post(sidecar, "/act", {"button": "a", "frames": 16})
+    _, entry = post(sidecar, "/act", {"actions": ["a", "a", "a"]})
     assert entry["changed"] == 0.0
+    assert entry["presses"] == 3
 
 
 def test_campaign_state_saved_in_resume_mode(sidecar, tmp_path):
     # fixture booted fresh: no state saved on act
-    post(sidecar, "/act", {"button": "a", "frames": 8})
+    post(sidecar, "/act", {"actions": ["a"]})
     assert not emu._campaign_path().exists()
 
     status, body = post(sidecar, "/reset?fresh=0")  # resume mode
     assert status == 200
-    post(sidecar, "/act", {"button": "a", "frames": 8})
+    post(sidecar, "/act", {"actions": ["a"]})
     assert emu._campaign_path().exists()
     assert emu._campaign_path().stat().st_size > 0
     assert "campaign-" in emu._campaign_path().name  # keyed to the ROM

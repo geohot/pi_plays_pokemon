@@ -46,13 +46,13 @@ def sprite_box(png: bytes):
 
 
 def test_toy_idle_screen_is_static(toy):
-    _, entry = post(toy, "/act", {"button": None, "frames": 60})
+    _, entry = post(toy, "/act", {"actions": []})
     assert entry["changed"] == 0.0
 
 
 def test_toy_dpad_moves_the_square(toy):
     _, before = get(toy, "/screen.png?scale=1")
-    _, entry = post(toy, "/act", {"button": "right", "frames": 60})
+    _, entry = post(toy, "/act", {"actions": ["right"]})
     assert entry["changed"] > 0
     _, after = get(toy, "/screen.png?scale=1")
 
@@ -63,24 +63,24 @@ def test_toy_dpad_moves_the_square(toy):
 
 
 def test_toy_a_flashes_and_b_restores(toy):
-    _, entry = post(toy, "/act", {"button": "a", "frames": 16})
+    _, entry = post(toy, "/act", {"actions": ["a"]})
     assert entry["changed"] > 0.9     # palette invert: the whole screen flips
 
-    _, entry = post(toy, "/act", {"button": "b", "frames": 16})
+    _, entry = post(toy, "/act", {"actions": ["b"]})
     assert entry["changed"] > 0.9     # and flips back
 
 
 def test_toy_start_resets_position(toy):
     _, before = get(toy, "/screen.png?scale=1")
-    post(toy, "/act", {"button": "right", "frames": 60})
-    post(toy, "/act", {"button": "start", "frames": 16})
+    post(toy, "/act", {"actions": ["right", "right"]})
+    post(toy, "/act", {"actions": ["start"]})
     _, after = get(toy, "/screen.png?scale=1")
     assert sprite_box(after) == sprite_box(before)
 
 
 def test_toy_campaign_resume_keeps_position(toy):
     post(toy, "/reset?fresh=0")       # resume mode: save state on every act
-    post(toy, "/act", {"button": "right", "frames": 60})
+    post(toy, "/act", {"actions": ["right"]})
     _, moved = get(toy, "/screen.png?scale=1")
 
     post(toy, "/reset?fresh=0")       # new run, same campaign
