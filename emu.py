@@ -14,6 +14,12 @@ Endpoints (all interfaces, port 8341 by default):
 
 Pixels in, button presses out. No game state is read from the emulator.
 
+The game runs in real time between actions (a background ticker, PokéBench
+semantics): the world moves while the model thinks, so every screenshot is a
+moment in time, not a paused frame. Actions themselves run at full speed under
+the same lock the ticker uses, so a press sequence is never interleaved with
+idle ticks.
+
 Configuration via environment:
   ROM_PATH   path to the .gb file (default: roms/pokemon_red.gb)
   EMU_PORT   HTTP port (default: 8341)
@@ -45,6 +51,8 @@ API_VERSION = 2              # action API generation; /status reports it so the 
                             # can detect (and replace) a sidecar from before the actions API
 BOOT_FRAMES = 240           # frames advanced on a fresh boot before first capture
 BUTTONS = ("up", "down", "left", "right", "a", "b", "start", "select")
+TICK_FRAMES = 6             # frames per ticker batch (the game idles in real time)
+GB_FPS = 59.7275            # Game Boy dot-clock frame rate
 
 _lock = threading.Lock()
 _emu = None
@@ -53,6 +61,50 @@ _step = 0
 _actions = []
 _agent = []          # rolling reasoning/text/action feed for the web UI
 _campaign = False    # resume mode: persist emulator state across runs
+_tick_thread = None   # real-time ticker (see start_ticker)
+_tick_stop = threading.Event()
+
+
+def start_ticker():
+    """Advance the emulator in real time while no act is in flight.
+
+    PokéBench semantics: the game keeps running between turns, so a screenshot
+    is a moment in time. The ticker shares the act lock, so it can never move
+    the game mid-press; it only fills the gaps where the model is thinking.
+    """
+    global _tick_thread
+    if _tick_thread is not None:
+        return
+    _tick_stop.clear()
+
+    def run():
+        next_at = time.monotonic()
+        while not _tick_stop.is_set():
+            try:
+                with _lock:
+                    if _emu is not None:
+                        _emu.tick(TICK_FRAMES, render=True, sound=False)
+            except Exception as exc:  # never let the ticker die
+                print(f"[ticker] {exc}", flush=True)
+                if _tick_stop.wait(0.1):
+                    break
+                continue
+            next_at += TICK_FRAMES / GB_FPS
+            if _tick_stop.wait(max(0.0, next_at - time.monotonic())):
+                break
+            next_at = time.monotonic()  # fell behind: resync, never spiral
+
+    _tick_thread = threading.Thread(target=run, name="ticker", daemon=True)
+    _tick_thread.start()
+
+
+def stop_ticker():
+    """Stop the real-time ticker (tests use this; the sidecar runs it for life)."""
+    global _tick_thread
+    _tick_stop.set()
+    thread, _tick_thread = _tick_thread, None
+    if thread is not None:
+        thread.join(timeout=2)
 
 
 _rom_cache = None
@@ -309,6 +361,7 @@ setInterval(tick, 500); tick();
 def main():
     RUNS.mkdir(exist_ok=True)
     reset(sys.argv[1] if len(sys.argv) > 1 else None)
+    start_ticker()
     server = ThreadingHTTPServer(("0.0.0.0", PORT), Handler)
     print(f"[emu] http://localhost:{PORT} (bound to 0.0.0.0) run={_run_dir.name}", flush=True)
     server.serve_forever()

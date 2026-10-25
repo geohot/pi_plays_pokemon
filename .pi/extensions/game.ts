@@ -11,7 +11,7 @@
  *   PI_FRESH    set to boot the ROM from scratch instead of resuming the
  *               campaign state
  *   REQUEST_LOG where to log model-visible actions (default: the run dir)
- *   PI_IMAGE_SCALE  screenshot scale sent to the model (default 4)
+ *   PI_IMAGE_SCALE  screenshot scale sent to the model (default 3, PokéBench's 480x432)
  */
 import { spawn } from "node:child_process";
 import { appendFileSync, existsSync, mkdirSync, openSync, readFileSync, writeFileSync } from "node:fs";
@@ -22,7 +22,7 @@ import { defineTool, type ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 const ROOT = join(fileURLToPath(import.meta.url), "..", "..", "..");
 const EMU = process.env.EMU_URL ?? "http://127.0.0.1:8341";
-const IMAGE_SCALE = Number(process.env.PI_IMAGE_SCALE ?? 4);
+const IMAGE_SCALE = Number(process.env.PI_IMAGE_SCALE ?? 3); // 3 = 480x432, PokéBench's wire size
 const ACT_API = 2; // emu.py's action API generation, reported by /status
 
 let requestLog = process.env.REQUEST_LOG ?? "";
@@ -185,9 +185,10 @@ const act = defineTool({
           "(restart the sidecar so /act speaks {\"actions\": [...]})");
       }
       logRequest({ kind: "act", ...entry });
-      const pct = (entry.changed * 100).toFixed(1);
+      // No screen-change feedback: RVB shows the model nothing the harness
+      // observed, so it must read the effect of its presses off the screenshot.
       const summary = `step ${entry.step}: ${entry.actions.join(" ") || "(no presses)"}` +
-        ` (${entry.presses} press${entry.presses === 1 ? "" : "es"}), screen change ${pct}%`;
+        ` (${entry.presses} press${entry.presses === 1 ? "" : "es"})`;
       return {
         content: [{ type: "text" as const, text: summary }, await screen()],
         details: entry,

@@ -1,6 +1,7 @@
 """HTTP API tests for the emulator sidecar (emu.py), using a synthetic ROM."""
 import io
 import json
+import time
 
 from PIL import Image
 
@@ -114,3 +115,17 @@ def test_ui_page_served(sidecar):
     status, body = get(sidecar, "/")
     assert status == 200
     assert b"<title>Game Boy</title>" in body
+
+
+def test_ticker_runs_the_game_in_real_time(sidecar):
+    # PokéBench semantics: the game advances between actions, at real-time
+    # pace, so a screenshot is a moment in time rather than a paused frame.
+    emu.start_ticker()
+    try:
+        before = emu._emu.frame_count
+        time.sleep(0.5)                    # ~30 frames at 59.7 fps, no act in flight
+        after = emu._emu.frame_count
+        assert after - before >= 10, "the game did not advance between actions"
+        assert after - before <= 60, "the ticker is not paced to real time"
+    finally:
+        emu.stop_ticker()

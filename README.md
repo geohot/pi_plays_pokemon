@@ -14,6 +14,13 @@ An empty list is a legal turn that presses nothing. There is no hold duration,
 no mash count, no wait button - one entry in the list is one press, which keeps
 runs on the two harnesses comparable.
 
+The information diet matches RVB too: screenshots go to the model at 480x432
+(PokéBench's wire size), the game runs in real time between actions (a
+background ticker, so a screenshot is a moment in time), and the model is never
+told how much the screen changed - it has to see that itself. The sidecar
+still records screen change per action in the evidence directory; the model
+just never sees it.
+
 ## Status
 
 The harness works and is fully tested (see below), but current open-weight
@@ -89,7 +96,7 @@ copyrighted ROM. Without the toy built, those tests skip cleanly.
 
 | File | Purpose |
 | --- | --- |
-| `emu.py` | emulator sidecar: screenshots, button presses, web UI (port 8341) |
+| `emu.py` | emulator sidecar: screenshots, button presses, real-time ticker, web UI (port 8341) |
 | `stream.py` | pretty-prints pi's `--mode json` event stream |
 | `.pi/SYSTEM.md` | the whole prompt: beat the game |
 | `.pi/extensions/game.ts` | `look` / `act` / `report` tools; boots the sidecar |
