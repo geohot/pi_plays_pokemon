@@ -8,8 +8,7 @@
  * Environment:
  *   EMU_URL     sidecar address (default http://127.0.0.1:8341)
  *   RUN_NAME    evidence directory under runs/ (default: run-<timestamp>)
- *   PI_FRESH    set to boot the ROM from scratch instead of resuming the
- *               campaign state
+ *   PI_FRESH    fresh boot by default; set to 0 to resume campaign state
  *   REQUEST_LOG where to log model-visible actions (default: the run dir)
  *   PI_IMAGE_SCALE  screenshot scale sent to the model (default 3, PokéBench's 480x432)
  */
@@ -106,7 +105,7 @@ function ensureEmu(): Promise<void> {
     }
     const name = process.env.RUN_NAME ??
       `run-${new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19)}`;
-    const fresh = process.env.PI_FRESH ? "&fresh=1" : "";
+    const fresh = process.env.PI_FRESH === "0" ? "&fresh=0" : "&fresh=1";
     const res = await fetch(`${EMU}/reset?name=${name}${fresh}`, { method: "POST" });
     if (!res.ok) throw new Error(`emulator reset failed: ${res.status}`);
     requestLog ||= join(ROOT, "runs", name, "model_requests.jsonl");

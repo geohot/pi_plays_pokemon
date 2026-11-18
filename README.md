@@ -64,16 +64,19 @@ to the three game tools. `-a` trusts the project extension for the run.
   action log, the request log and `result.json` (the model's verdict).
   Name the run yourself with `RUN_NAME=my-run`.
 - One run at a time: runs share the single emulator and sidecar.
+- Stop the emulator sidecar and web UI: `./kill.sh`.
 
 ## Campaign state (runs/campaign-<rom>.state)
 
-A game run **resumes** by default: the emulator state is saved after every
-action and reloaded on the next run, so progress accumulates across runs (a
-30-hour game cannot be beaten if every run reboots the ROM). A resumed run
-therefore starts wherever the last one ended — not in the bedroom. The state
-is keyed to the ROM, so different games never clobber each other.
+A game run starts **fresh** by default. Set `PI_FRESH=0` to resume a campaign:
+the emulator state is then saved after every action and reloaded on the next
+run, so progress accumulates across runs (a 30-hour game cannot be beaten if
+every run reboots the ROM). A resumed run therefore starts wherever the last
+one ended — not in the bedroom. The state is keyed to the ROM, so different
+games never clobber each other.
 
-- Start the game over: `PI_FRESH=1 pi -a "Beat the game."`
+- Resume the previous game: `PI_FRESH=0 pi -a "Beat the game."`
+- Start the game over: `pi -a "Beat the game."` (or set `PI_FRESH=1`).
 - The web UI says which mode a run is in.
 
 ## Testing
@@ -98,6 +101,7 @@ copyrighted ROM. Without the toy built, those tests skip cleanly.
 | --- | --- |
 | `emu.py` | emulator sidecar: screenshots, button presses, real-time ticker, web UI (port 8341) |
 | `stream.py` | pretty-prints pi's `--mode json` event stream |
+| `kill.sh` | stops the emulator sidecar and web UI |
 | `.pi/SYSTEM.md` | the whole prompt: beat the game |
 | `.pi/extensions/game.ts` | `look` / `act` / `report` tools; boots the sidecar |
 | `toy/toy.asm` | the toy test cartridge (RGBDS assembly) |

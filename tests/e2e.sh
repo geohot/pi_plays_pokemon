@@ -56,7 +56,7 @@ export EMU_PORT
 export EMU_URL="http://127.0.0.1:$EMU_PORT"
 export PI_CODING_AGENT_DIR="$AGENT_DIR"
 export RUN_NAME="$RUN"
-export PI_FRESH=1
+# PI_FRESH is intentionally unset: a normal run must boot fresh by default.
 
 timeout 180 pi -a \
   --provider stub --model stub-1 \
