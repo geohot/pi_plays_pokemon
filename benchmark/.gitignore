@@ -5,3 +5,4 @@ __pycache__/
 # emulator save states hold copies of game data (VRAM tiles, data copied from the ROM: up to ~6 KB of
 # ROM-identical bytes each): rebuilt locally by `build.py select` from ../runs, never committed
 data/states/
+results/

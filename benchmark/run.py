@@ -97,6 +97,12 @@ def main():
     a = ap.parse_args()
     if not (a.model or a.pi):
         ap.error("--model or --pi")
+    if a.pi:
+        provider, model = a.pi.split("/", 1)
+        p = subprocess.run(["pi", "--offline", "--provider", provider, "--model", model, "--list-models"],
+                           capture_output=True, text=True, timeout=30)
+        if p.returncode != 0 or p.stderr.strip():
+            ap.error(p.stderr.strip() or f"pi --list-models exited with status {p.returncode}")
     name = a.name or (a.model or a.pi).replace("/", "_")
     items = [json.loads(x) for x in (HERE / "data" / "items.jsonl").open()]
     if a.categories:
@@ -153,12 +159,13 @@ def main():
 
     n = ok = 0
     with cf.ThreadPoolExecutor(a.workers) as ex:
-        for row in ex.map(one, todo):
+        futures = [ex.submit(one, item) for item in todo]
+        for future in cf.as_completed(futures):
+            row = future.result()
             n += 1
             ok += bool(row.get("correct"))
-            if n % 20 == 0 or n == len(todo):
-                print(f"{name}: {n}/{len(todo)} asked, {ok} correct so far, last {row['seconds']}s"
-                      f"{' ERROR ' + row['error'][:80] if 'error' in row else ''}", flush=True)
+            print(f"{name}: {n}/{len(todo)} asked, {ok} correct so far, {row['id']} {row['seconds']}s"
+                  f"{' ERROR ' + row['error'][:80] if 'error' in row else ''}", flush=True)
 
 
 if __name__ == "__main__":
