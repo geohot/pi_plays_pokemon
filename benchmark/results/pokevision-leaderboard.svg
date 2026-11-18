@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1440" height="1080" viewBox="0 0 1440 1080" role="img" aria-labelledby="title desc"><title id="title">PokeVision: Can AI read a Pokémon Red screen?</title><desc id="desc">Macro accuracy on 337 screenshot questions across ten categories. Kimi and Qwen each show the average of two completed runs; controls are listed separately.</desc>
+<rect x="0" y="0" width="1440" height="1080" fill="#FFFFFF"/>
+<rect x="0" y="0" width="1440" height="242" fill="#F0F5F0"/>
+<rect x="62" y="39" width="8" height="8" fill="#216346"/>
+<rect x="78" y="39" width="8" height="8" fill="#216346"/>
+<rect x="62" y="55" width="8" height="8" fill="#216346"/>
+<rect x="78" y="55" width="8" height="8" fill="#216346"/>
+<rect x="70" y="47" width="8" height="8" fill="#216346"/>
+<text x="103" y="60" fill="#216346" font-family="Liberation Sans,Arial,sans-serif" font-size="26" font-weight="700" text-anchor="start" letter-spacing="2">POKEVISION</text>
+<text x="309" y="59" fill="#50615A" font-family="Liberation Mono,monospace" font-size="21" font-weight="400" text-anchor="start" letter-spacing="0">/   VISION BENCHMARK</text>
+<text x="58" y="143" fill="#19221F" font-family="Liberation Sans,Arial,sans-serif" font-size="60" font-weight="700" text-anchor="start" letter-spacing="-1.5">Can AI read a Pokémon Red screen?</text>
+<text x="61" y="201" fill="#50615A" font-family="Liberation Sans,Arial,sans-serif" font-size="29" font-weight="400" text-anchor="start" letter-spacing="0">337 questions across 10 categories. One screenshot per question, no history.</text>
+<rect x="1172" y="22" width="212" height="192" fill="#19221F"/>
+<image x="1178" y="28" width="200" height="180" image-rendering="pixelated" xlink:href="data:image/png;base64,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"/>
+<text x="1278" y="233" fill="#50615A" font-family="Liberation Mono,monospace" font-size="14" font-weight="400" text-anchor="middle" letter-spacing="0">ITEM: ENEMY_NAME-000</text>
+<text x="60" y="301" fill="#19221F" font-family="Liberation Sans,Arial,sans-serif" font-size="40" font-weight="700" text-anchor="start" letter-spacing="0">Macro accuracy</text>
+<text x="368" y="299" fill="#50615A" font-family="Liberation Sans,Arial,sans-serif" font-size="25" font-weight="400" text-anchor="start" letter-spacing="0">Mean of the 10 category accuracies</text>
+<text x="1378" y="299" fill="#216346" font-family="Liberation Mono,monospace" font-size="20" font-weight="700" text-anchor="end" letter-spacing="0">HIGHER IS BETTER →</text>
+<rect x="479.0" y="365" width="1" height="479" fill="#CBD5CE"/>
+<text x="479.0" y="353" fill="#50615A" font-family="Liberation Mono,monospace" font-size="20" font-weight="400" text-anchor="middle" letter-spacing="0">0%</text>
+<rect x="675.25" y="365" width="1" height="479" fill="#CBD5CE"/>
+<text x="675.25" y="353" fill="#50615A" font-family="Liberation Mono,monospace" font-size="20" font-weight="400" text-anchor="middle" letter-spacing="0">25%</text>
+<rect x="871.5" y="365" width="1" height="479" fill="#CBD5CE"/>
+<text x="871.5" y="353" fill="#50615A" font-family="Liberation Mono,monospace" font-size="20" font-weight="400" text-anchor="middle" letter-spacing="0">50%</text>
+<rect x="1067.75" y="365" width="1" height="479" fill="#CBD5CE"/>
+<text x="1067.75" y="353" fill="#50615A" font-family="Liberation Mono,monospace" font-size="20" font-weight="400" text-anchor="middle" letter-spacing="0">75%</text>
+<rect x="1264.0" y="365" width="1" height="479" fill="#CBD5CE"/>
+<text x="1264.0" y="353" fill="#50615A" font-family="Liberation Mono,monospace" font-size="20" font-weight="400" text-anchor="middle" letter-spacing="0">100%</text>
+<text x="60" y="353" fill="#50615A" font-family="Liberation Mono,monospace" font-size="17" font-weight="700" text-anchor="start" letter-spacing="1">MODEL / CONFIGURATION</text>
+<text x="1378" y="353" fill="#50615A" font-family="Liberation Mono,monospace" font-size="17" font-weight="700" text-anchor="end" letter-spacing="1">SCORE</text>
+<text x="60" y="407" fill="#19221F" font-family="Liberation Sans,Arial,sans-serif" font-size="29" font-weight="700" text-anchor="start" letter-spacing="0">GPT-6.2 Astra</text>
+<text x="450" y="406" fill="#50615A" font-family="Liberation Sans,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="end" letter-spacing="0"></text>
+<rect x="479" y="384" width="771.6674603174605" height="28" fill="#1f1f1f"/>
+<text x="1378" y="408" fill="#19221F" font-family="Liberation Mono,monospace" font-size="30" font-weight="700" text-anchor="end" letter-spacing="0">98.3%</text>
+<text x="60" y="476" fill="#19221F" font-family="Liberation Sans,Arial,sans-serif" font-size="29" font-weight="400" text-anchor="start" letter-spacing="0">Claude Opus 5.5</text>
+<text x="450" y="475" fill="#50615A" font-family="Liberation Sans,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="end" letter-spacing="0">high</text>
+<rect x="479" y="453" width="758.5841269841269" height="28" fill="#cc785c"/>
+<text x="1378" y="477" fill="#19221F" font-family="Liberation Mono,monospace" font-size="30" font-weight="700" text-anchor="end" letter-spacing="0">96.6%</text>
+<text x="60" y="545" fill="#19221F" font-family="Liberation Sans,Arial,sans-serif" font-size="29" font-weight="400" text-anchor="start" letter-spacing="0">Claude Opus 5.5</text>
+<text x="450" y="544" fill="#50615A" font-family="Liberation Sans,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="end" letter-spacing="0">off</text>
+<rect x="479" y="522" width="749.7996031746032" height="28" fill="#cc785c"/>
+<text x="1378" y="546" fill="#19221F" font-family="Liberation Mono,monospace" font-size="30" font-weight="700" text-anchor="end" letter-spacing="0">95.5%</text>
+<text x="60" y="614" fill="#19221F" font-family="Liberation Sans,Arial,sans-serif" font-size="29" font-weight="400" text-anchor="start" letter-spacing="0">Kimi K3.1 Pro</text>
+<text x="450" y="613" fill="#50615A" font-family="Liberation Sans,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="end" letter-spacing="0">2-run avg</text>
+<rect x="479" y="591" width="721.3589285714287" height="28" fill="#047AFE"/>
+<text x="1378" y="615" fill="#19221F" font-family="Liberation Mono,monospace" font-size="30" font-weight="700" text-anchor="end" letter-spacing="0">91.9%</text>
+<text x="60" y="683" fill="#19221F" font-family="Liberation Sans,Arial,sans-serif" font-size="29" font-weight="400" text-anchor="start" letter-spacing="0">Qwen3.8-Flash-Next</text>
+<text x="450" y="682" fill="#50615A" font-family="Liberation Sans,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="end" letter-spacing="0">2-run avg</text>
+<rect x="479" y="660" width="646.0947172619046" height="28" fill="#ff7018"/>
+<text x="1378" y="684" fill="#19221F" font-family="Liberation Mono,monospace" font-size="30" font-weight="700" text-anchor="end" letter-spacing="0">82.3%</text>
+<text x="60" y="752" fill="#19221F" font-family="Liberation Sans,Arial,sans-serif" font-size="29" font-weight="400" text-anchor="start" letter-spacing="0">GLM-5.3-Flash</text>
+<text x="450" y="751" fill="#50615A" font-family="Liberation Sans,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="end" letter-spacing="0"></text>
+<rect x="479" y="729" width="607.1834821428571" height="28" fill="#1c7ff8"/>
+<text x="1378" y="753" fill="#19221F" font-family="Liberation Mono,monospace" font-size="30" font-weight="700" text-anchor="end" letter-spacing="0">77.3%</text>
+<text x="60" y="821" fill="#19221F" font-family="Liberation Sans,Arial,sans-serif" font-size="29" font-weight="400" text-anchor="start" letter-spacing="0">HY4-Flash</text>
+<text x="450" y="820" fill="#50615A" font-family="Liberation Sans,Arial,sans-serif" font-size="23" font-weight="400" text-anchor="end" letter-spacing="0"></text>
+<rect x="479" y="798" width="519.7587797619047" height="28" fill="#5CB9FF"/>
+<text x="1378" y="822" fill="#19221F" font-family="Liberation Mono,monospace" font-size="30" font-weight="700" text-anchor="end" letter-spacing="0">66.2%</text>
+<rect x="60" y="860" width="1320" height="1" fill="#CBD5CE"/>
+<rect x="60" y="880" width="1320" height="66" fill="#F1F4F1"/>
+<text x="84" y="922" fill="#50615A" font-family="Liberation Mono,monospace" font-size="20" font-weight="700" text-anchor="start" letter-spacing="1">CONTROLS</text>
+<text x="261" y="923" fill="#19221F" font-family="Liberation Sans,Arial,sans-serif" font-size="26" font-weight="400" text-anchor="start" letter-spacing="0">Most common answer</text>
+<text x="548" y="923" fill="#19221F" font-family="Liberation Mono,monospace" font-size="27" font-weight="700" text-anchor="start" letter-spacing="0">21.6%</text>
+<rect x="680" y="895" width="1" height="36" fill="#CBD5CE"/>
+<text x="717" y="923" fill="#19221F" font-family="Liberation Sans,Arial,sans-serif" font-size="26" font-weight="400" text-anchor="start" letter-spacing="0">GLM-5.3 without an image</text>
+<text x="1355" y="923" fill="#19221F" font-family="Liberation Mono,monospace" font-size="27" font-weight="700" text-anchor="end" letter-spacing="0">11.1%</text>
+<text x="60" y="991" fill="#50615A" font-family="Liberation Sans,Arial,sans-serif" font-size="25" font-weight="400" text-anchor="start" letter-spacing="0">Answers checked against the emulator. Missing or invalid answers count as wrong.</text>
+<text x="60" y="1044" fill="#216346" font-family="Liberation Mono,monospace" font-size="19" font-weight="700" text-anchor="start" letter-spacing="0">SOURCE  /  github.com/geohot/pi_plays_pokemon</text>
+<text x="1378" y="1044" fill="#50615A" font-family="Liberation Mono,monospace" font-size="18" font-weight="400" text-anchor="end" letter-spacing="0">POKEVISION  /  BENCHMARK RESULTS</text>
+</svg>
