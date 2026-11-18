@@ -25,7 +25,7 @@ map and never the same screen twice. Scoring is exact match after light normaliz
 quote styles, and `NIDORAN♂` ≈ `NIDORAN`. No answer, invalid JSON or a reply cut off at the token limit counts as wrong.
 These are also counted separately. **Macro** is the mean of the 10 category accuracies.
 
-## Results (Nov 18, llm.tinygrad.win, each model's default sampling, max_tokens 16384)
+## Results (Nov 18; llm.tinygrad.win except HY4 via OpenRouter and Astra via OpenAI Codex; each model's default sampling, max_tokens 16384)
 
 `/v1/models` lists four models. Three of them accept pictures. **`zai-org/GLM-5.3` does not**: the gateway drops
 the image (131 prompt tokens against ~390 with the picture), and the model says it got no image or hallucinates tool
@@ -33,11 +33,13 @@ calls. It is kept as a **blind control**: what the questions give away without s
 
 | model | macro | correct | reading | graphics | scene | text | cursor | e_name | e_level | p_hp | hp_bar | facing | npc | walk | place |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| openai-codex/gpt-6.2-astra | **98.3** | 331/337 | 99.4 | 99.1 | 94.3 | 97 | 100 | 100 | 100 | 100 | 100 | 97 | 100 | 100 | 89 |
 | claude-opus-5-5, thinking high (calibration) | **96.6** | 325/337 | 100 | 92.6 | 94.3 | 100 | 100 | 100 | 100 | 100 | 100 | 78 | 100 | 100 | 89 |
 | claude-opus-5-5, thinking off (calibration) | **95.5** | 321/337 | 100 | 91.7 | 90.1 | 100 | 100 | 100 | 100 | 100 | 100 | 75 | 100 | 94 | 86 |
 | moonshotai/Kimi-K3.1-Pro (run 1 / run 2) | **91.4 / 92.3** | 307 / 310 | 100 / 99.4 | 79 / 82 | 89 / 90 | 100/97 | 100 | 100 | 100 | 100 | 84/91 | 56/56 | 97/100 | 97/97 | 80/83 |
 | qwen/Qwen3.8-Flash-Next (run 1 / run 2) | **82.6 / 82.0** | 276 / 274 | 97.8 / 97.7 | 68 / 64 | 66 / 70 | 89/92 | 100 | 100 | 100/97 | 100 | 69/72 | 47/36 | 89/83 | 75/81 | 57/60 |
 | zai-org/GLM-5.3-Flash | **77.3** | 259 | 90.7 | 64.5 | 63.4 | 86 | 97 | 100 | 73 | 97 | 66 | 39 | 89 | 64 | 63 |
+| openrouter/tencent/hy4-flash | **66.2** | 222/337 | 80.0 | 44.3 | 64.6 | 69 | 97 | 97 | 50 | 87 | 47 | 42 | 44 | 81 | 49 |
 | zai-org/GLM-5.3 (no vision on the gateway: blind control) | 11.1 | 38 | 3 | 14 | 27 | 0 | 0 | 7 | 10 | 0 | 16 | 22 | 3 | 36 | 17 |
 | guessing the most common answer | 21.6 | | | | | 3 | 6 | 27 | 27 | 3 | 31 | 25 | 25 | 50 | 20 |
 
@@ -46,15 +48,17 @@ Full tables with k/n, 95% Wilson intervals, invalid / no-final counts, latency a
 has a ±10-15 point interval; the macro and the group columns are the numbers to compare.
 
 What it says:
-- **Reading the screen is solved** for every vision model here (Kimi and Qwen 98-100%). GLM-5.3-Flash loses a
-  little: 3 of its 8 level misses and several others are replies cut off at 16,384 tokens of thinking.
+- **Astra, Kimi and Qwen read the screen almost perfectly** (98-100% group accuracy). GLM-5.3-Flash loses a little: 3 of
+  its 8 level misses and several others are replies cut off at 16,384 tokens of thinking. HY4 trails at 80% reading,
+  including only 50% on enemy level.
 - **The open models fall behind on graphics and scene understanding.** Examples: which way the player faces,
   how full the enemy HP bar is, whether a step is blocked, and what kind of building this is. Qwen and GLM-Flash
-  are near chance on facing (36-47%; chance 25%) and only 57-64% on place. These are the skills the agent's walls
-  in `../runs` point at (e.g. taking an ordinary house for a Pokemon Center).
-- **Facing "right" is a blind spot for every model, the calibrator included.** 4 items are missed by all 7 vision
-  runs, all four with truth `right`. They were checked by eye on 8x crops (the cap brim and face point right).
-  Models mostly answer `down`.
+  are near chance on facing (36-47%; chance 25%) and only 57-64% on place. HY4 is lower still on graphics (44%),
+  including 44% on NPC count and 49% on place. These are the skills the agent's walls in `../runs` point at (e.g.
+  taking an ordinary house for a Pokemon Center).
+- **Facing "right" is a blind spot for the earlier models, the calibrator included.** 3 items are missed by all 8
+  pre-Astra vision runs, all three with truth `right`. They were checked by eye on 8x crops (the cap brim and face
+  point right). Models mostly answer `down`; Astra gets all three and misses only one facing item (`down` as `up`).
 - **GLM-5.3-Flash thinks itself out of answers on `walkable`.** 12 of 36 replies hit the 16,384-token limit with no
   final answer (median 98 s a question). Over the whole set it has 24 cut-off replies; Qwen has 2-4, Kimi 0-1.
 - Run-to-run spread with default sampling: Kimi 91.4 vs 92.3, Qwen 82.6 vs 82.0.

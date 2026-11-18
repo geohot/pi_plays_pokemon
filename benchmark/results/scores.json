@@ -1334,5 +1334,339 @@
    321,
    337
   ]
+ },
+ "openai-codex_gpt-6.2-astra": {
+  "file": "openai-codex_gpt-6.2-astra.jsonl",
+  "cats": {
+   "text": {
+    "k": 35,
+    "n": 36,
+    "acc": 0.9722222222222222,
+    "ci": [
+     0.8582996626496918,
+     0.9950797197044302
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 10.2,
+    "median_out_tokens": null,
+    "mean_cer": 0.000992063492063492
+   },
+   "cursor": {
+    "k": 36,
+    "n": 36,
+    "acc": 1.0,
+    "ci": [
+     0.9035781695514236,
+     1.0
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 7.9,
+    "median_out_tokens": null
+   },
+   "enemy_name": {
+    "k": 30,
+    "n": 30,
+    "acc": 1.0,
+    "ci": [
+     0.8864829086095221,
+     1.0
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 8.9,
+    "median_out_tokens": null
+   },
+   "enemy_level": {
+    "k": 30,
+    "n": 30,
+    "acc": 1.0,
+    "ci": [
+     0.8864829086095221,
+     1.0
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 8.8,
+    "median_out_tokens": null
+   },
+   "player_hp": {
+    "k": 30,
+    "n": 30,
+    "acc": 1.0,
+    "ci": [
+     0.8864829086095221,
+     1.0
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 7.3,
+    "median_out_tokens": null
+   },
+   "enemy_hp_bar": {
+    "k": 32,
+    "n": 32,
+    "acc": 1.0,
+    "ci": [
+     0.8928172849426366,
+     1.0
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 8.8,
+    "median_out_tokens": null
+   },
+   "facing": {
+    "k": 35,
+    "n": 36,
+    "acc": 0.9722222222222222,
+    "ci": [
+     0.8582996626496918,
+     0.9950797197044302
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 7.8,
+    "median_out_tokens": null
+   },
+   "npc_count": {
+    "k": 36,
+    "n": 36,
+    "acc": 1.0,
+    "ci": [
+     0.9035781695514236,
+     1.0
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 8.0,
+    "median_out_tokens": null
+   },
+   "walkable": {
+    "k": 36,
+    "n": 36,
+    "acc": 1.0,
+    "ci": [
+     0.9035781695514236,
+     1.0
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 9.8,
+    "median_out_tokens": null
+   },
+   "place": {
+    "k": 31,
+    "n": 35,
+    "acc": 0.8857142857142857,
+    "ci": [
+     0.7404820521187976,
+     0.9546489414551025
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 8.1,
+    "median_out_tokens": null
+   }
+  },
+  "n_rows": 337,
+  "macro": 0.9830158730158731,
+  "groups": {
+   "reading": 0.9944444444444445,
+   "graphics": 0.9907407407407408,
+   "scene": 0.9428571428571428
+  },
+  "micro": [
+   331,
+   337
+  ]
+ },
+ "openrouter_tencent_hy4-flash": {
+  "file": "openrouter_tencent_hy4-flash.jsonl",
+  "cats": {
+   "text": {
+    "k": 25,
+    "n": 36,
+    "acc": 0.6944444444444444,
+    "ci": [
+     0.5314342132091627,
+     0.8199572971719464
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 3.4,
+    "median_out_tokens": null,
+    "mean_cer": 0.013272546611030556
+   },
+   "cursor": {
+    "k": 35,
+    "n": 36,
+    "acc": 0.9722222222222222,
+    "ci": [
+     0.8582996626496918,
+     0.9950797197044302
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 3.1,
+    "median_out_tokens": null
+   },
+   "enemy_name": {
+    "k": 29,
+    "n": 30,
+    "acc": 0.9666666666666667,
+    "ci": [
+     0.8332924860304112,
+     0.9940915620051425
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 3.1,
+    "median_out_tokens": null
+   },
+   "enemy_level": {
+    "k": 15,
+    "n": 30,
+    "acc": 0.5,
+    "ci": [
+     0.33153851227173764,
+     0.6684614877282624
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 3.2,
+    "median_out_tokens": null
+   },
+   "player_hp": {
+    "k": 26,
+    "n": 30,
+    "acc": 0.8666666666666667,
+    "ci": [
+     0.7031831605558306,
+     0.9469043057578189
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 2.9,
+    "median_out_tokens": null
+   },
+   "enemy_hp_bar": {
+    "k": 15,
+    "n": 32,
+    "acc": 0.46875,
+    "ci": [
+     0.30869129901682335,
+     0.6355076206742619
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 3.1,
+    "median_out_tokens": null
+   },
+   "facing": {
+    "k": 15,
+    "n": 36,
+    "acc": 0.4166666666666667,
+    "ci": [
+     0.2714033350508729,
+     0.5780003033572231
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 3.4,
+    "median_out_tokens": null
+   },
+   "npc_count": {
+    "k": 16,
+    "n": 36,
+    "acc": 0.4444444444444444,
+    "ci": [
+     0.2954102987654314,
+     0.6041921268399659
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 3.1,
+    "median_out_tokens": null
+   },
+   "walkable": {
+    "k": 29,
+    "n": 36,
+    "acc": 0.8055555555555556,
+    "ci": [
+     0.6497163793648479,
+     0.9024702798054665
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 3.4,
+    "median_out_tokens": null
+   },
+   "place": {
+    "k": 17,
+    "n": 35,
+    "acc": 0.4857142857142857,
+    "ci": [
+     0.32993980391252736,
+     0.6443146037328837
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 3.5,
+    "median_out_tokens": null
+   }
+  },
+  "n_rows": 337,
+  "macro": 0.6621130952380953,
+  "groups": {
+   "reading": 0.8,
+   "graphics": 0.44328703703703703,
+   "scene": 0.6456349206349207
+  },
+  "micro": [
+   222,
+   337
+  ]
  }
 }
