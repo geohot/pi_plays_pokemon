@@ -25,7 +25,7 @@ map and never the same screen twice. Scoring is exact match after light normaliz
 quote styles, and `NIDORAN♂` ≈ `NIDORAN`. No answer, invalid JSON or a reply cut off at the token limit counts as wrong.
 These are also counted separately. **Macro** is the mean of the 10 category accuracies.
 
-## Results (Nov 18; llm.tinygrad.win except HY4 via OpenRouter and Astra via OpenAI Codex; each model's default sampling, max_tokens 16384)
+## Results (Nov 18; llm.tinygrad.win, OpenRouter, OpenAI Codex, and Anthropic; default sampling, max_tokens 16384)
 
 `/v1/models` lists four models. Three of them accept pictures. **`zai-org/GLM-5.3` does not**: the gateway drops
 the image (131 prompt tokens against ~390 with the picture), and the model says it got no image or hallucinates tool
@@ -37,7 +37,10 @@ calls. It is kept as a **blind control**: what the questions give away without s
 | claude-opus-5-5, thinking high (calibration) | **96.6** | 325/337 | 100 | 92.6 | 94.3 | 100 | 100 | 100 | 100 | 100 | 100 | 78 | 100 | 100 | 89 |
 | claude-opus-5-5, thinking off (calibration) | **95.5** | 321/337 | 100 | 91.7 | 90.1 | 100 | 100 | 100 | 100 | 100 | 100 | 75 | 100 | 94 | 86 |
 | moonshotai/Kimi-K3.1-Pro (run 1 / run 2) | **91.4 / 92.3** | 307 / 310 | 100 / 99.4 | 79 / 82 | 89 / 90 | 100/97 | 100 | 100 | 100 | 100 | 84/91 | 56/56 | 97/100 | 97/97 | 80/83 |
+| openrouter/thinkingmachines/inkling-2-small:free (thinking high) | **89.9** | 301/337 | 99.4 | 83.1 | 76.0 | 97 | 100 | 100 | 100 | 100 | 94 | 64 | 92 | 81 | 71 |
+| openrouter/qwen/qwen4-max (thinking high) | **88.1** | 295/337 | 97.1 | 78.4 | 80.2 | 89 | 100 | 100 | 100 | 97 | 91 | 61 | 83 | 86 | 74 |
 | qwen/Qwen3.8-Flash-Next (run 1 / run 2) | **82.6 / 82.0** | 276 / 274 | 97.8 / 97.7 | 68 / 64 | 66 / 70 | 89/92 | 100 | 100 | 100/97 | 100 | 69/72 | 47/36 | 89/83 | 75/81 | 57/60 |
+| openrouter/deepseek/deepseek-v4.1-flash-1017 (thinking high) | **81.7** | 273/337 | 93.8 | 63.3 | 78.9 | 78 | 94 | 100 | 97 | 100 | 59 | 42 | 89 | 78 | 80 |
 | zai-org/GLM-5.3-Flash | **77.3** | 259 | 90.7 | 64.5 | 63.4 | 86 | 97 | 100 | 73 | 97 | 66 | 39 | 89 | 64 | 63 |
 | openrouter/tencent/hy4-flash | **66.2** | 222/337 | 80.0 | 44.3 | 64.6 | 69 | 97 | 97 | 50 | 87 | 47 | 42 | 44 | 81 | 49 |
 | zai-org/GLM-5.3 (no vision on the gateway: blind control) | 11.1 | 38 | 3 | 14 | 27 | 0 | 0 | 7 | 10 | 0 | 16 | 22 | 3 | 36 | 17 |
@@ -48,11 +51,13 @@ Full tables with k/n, 95% Wilson intervals, invalid / no-final counts, latency a
 has a ±10-15 point interval; the macro and the group columns are the numbers to compare.
 
 What it says:
-- **Astra, Kimi and Qwen read the screen almost perfectly** (98-100% group accuracy). GLM-5.3-Flash loses a little: 3 of
-  its 8 level misses and several others are replies cut off at 16,384 tokens of thinking. HY4 trails at 80% reading,
-  including only 50% on enemy level.
+- **Inkling 2 Small leads the three new runs** at 89.9 macro (301/337), just behind Kimi. Qwen4 Max with high thinking
+  reaches 88.1 and DeepSeek V4.1 Flash 81.7. Inkling combines 99.4 reading and 83.1 graphics with a weaker 76.0 scene.
+- **Astra, Inkling, Kimi and Qwen read the screen almost perfectly** (97-100% group accuracy). DeepSeek reaches 94%.
+  GLM-5.3-Flash loses a little: 3 of its 8 level misses and several others are replies cut off at 16,384 tokens of
+  thinking. HY4 trails at 80% reading, including only 50% on enemy level.
 - **The open models fall behind on graphics and scene understanding.** Examples: which way the player faces,
-  how full the enemy HP bar is, whether a step is blocked, and what kind of building this is. Qwen and GLM-Flash
+  how full the enemy HP bar is, whether a step is blocked, and what kind of building this is. Qwen3.8 and GLM-Flash
   are near chance on facing (36-47%; chance 25%) and only 57-64% on place. HY4 is lower still on graphics (44%),
   including 44% on NPC count and 49% on place. These are the skills the agent's walls in `../runs` point at (e.g.
   taking an ordinary house for a Pokemon Center).
@@ -60,8 +65,8 @@ What it says:
   pre-Astra vision runs, all three with truth `right`. They were checked by eye on 8x crops (the cap brim and face
   point right). Models mostly answer `down`; Astra gets all three and misses only one facing item (`down` as `up`).
 - **GLM-5.3-Flash thinks itself out of answers on `walkable`.** 12 of 36 replies hit the 16,384-token limit with no
-  final answer (median 98 s a question). Over the whole set it has 24 cut-off replies; Qwen has 2-4, Kimi 0-1.
-- Run-to-run spread with default sampling: Kimi 91.4 vs 92.3, Qwen 82.6 vs 82.0.
+  final answer (median 98 s a question). Over the whole set it has 24 cut-off replies; Qwen3.8 has 2-4, Kimi 0-1.
+- Run-to-run spread with default sampling: Kimi 91.4 vs 92.3, Qwen3.8 82.6 vs 82.0.
 
 ## Calibration (with myself, claude-opus-5-5)
 

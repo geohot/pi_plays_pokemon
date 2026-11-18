@@ -1502,6 +1502,340 @@
    337
   ]
  },
+ "openrouter_deepseek_v4.1-flash-1017-high": {
+  "file": "openrouter_deepseek_v4.1-flash-1017-high.jsonl",
+  "cats": {
+   "text": {
+    "k": 28,
+    "n": 36,
+    "acc": 0.7777777777777778,
+    "ci": [
+     0.6191498017214091,
+     0.882838070251604
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 3.2,
+    "median_out_tokens": null,
+    "mean_cer": 0.009972372053321708
+   },
+   "cursor": {
+    "k": 34,
+    "n": 36,
+    "acc": 0.9444444444444444,
+    "ci": [
+     0.8185502589238878,
+     0.9846303362329332
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 2.0,
+    "median_out_tokens": null
+   },
+   "enemy_name": {
+    "k": 30,
+    "n": 30,
+    "acc": 1.0,
+    "ci": [
+     0.8864829086095221,
+     1.0
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 2.0,
+    "median_out_tokens": null
+   },
+   "enemy_level": {
+    "k": 29,
+    "n": 30,
+    "acc": 0.9666666666666667,
+    "ci": [
+     0.8332924860304112,
+     0.9940915620051425
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 1.7,
+    "median_out_tokens": null
+   },
+   "player_hp": {
+    "k": 30,
+    "n": 30,
+    "acc": 1.0,
+    "ci": [
+     0.8864829086095221,
+     1.0
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 2.3,
+    "median_out_tokens": null
+   },
+   "enemy_hp_bar": {
+    "k": 19,
+    "n": 32,
+    "acc": 0.59375,
+    "ci": [
+     0.4225972657298823,
+     0.744805975196862
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 4.1,
+    "median_out_tokens": null
+   },
+   "facing": {
+    "k": 15,
+    "n": 36,
+    "acc": 0.4166666666666667,
+    "ci": [
+     0.2714033350508729,
+     0.5780003033572231
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 12.6,
+    "median_out_tokens": null
+   },
+   "npc_count": {
+    "k": 32,
+    "n": 36,
+    "acc": 0.8888888888888888,
+    "ci": [
+     0.7468487098496367,
+     0.9559343109125816
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 4.0,
+    "median_out_tokens": null
+   },
+   "walkable": {
+    "k": 28,
+    "n": 36,
+    "acc": 0.7777777777777778,
+    "ci": [
+     0.6191498017214091,
+     0.882838070251604
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 13.3,
+    "median_out_tokens": null
+   },
+   "place": {
+    "k": 28,
+    "n": 35,
+    "acc": 0.8,
+    "ci": [
+     0.6410806339053748,
+     0.899576805540992
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 4.2,
+    "median_out_tokens": null
+   }
+  },
+  "n_rows": 337,
+  "macro": 0.8165972222222223,
+  "groups": {
+   "reading": 0.9377777777777778,
+   "graphics": 0.6331018518518519,
+   "scene": 0.788888888888889
+  },
+  "micro": [
+   273,
+   337
+  ]
+ },
+ "openrouter_qwen_qwen4-max-high": {
+  "file": "openrouter_qwen_qwen4-max-high.jsonl",
+  "cats": {
+   "text": {
+    "k": 32,
+    "n": 36,
+    "acc": 0.8888888888888888,
+    "ci": [
+     0.7468487098496367,
+     0.9559343109125816
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 4.3,
+    "median_out_tokens": null,
+    "mean_cer": 0.0037454885800474033
+   },
+   "cursor": {
+    "k": 36,
+    "n": 36,
+    "acc": 1.0,
+    "ci": [
+     0.9035781695514236,
+     1.0
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 3.0,
+    "median_out_tokens": null
+   },
+   "enemy_name": {
+    "k": 30,
+    "n": 30,
+    "acc": 1.0,
+    "ci": [
+     0.8864829086095221,
+     1.0
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 3.0,
+    "median_out_tokens": null
+   },
+   "enemy_level": {
+    "k": 30,
+    "n": 30,
+    "acc": 1.0,
+    "ci": [
+     0.8864829086095221,
+     1.0
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 3.0,
+    "median_out_tokens": null
+   },
+   "player_hp": {
+    "k": 29,
+    "n": 30,
+    "acc": 0.9666666666666667,
+    "ci": [
+     0.8332924860304112,
+     0.9940915620051425
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 3.6,
+    "median_out_tokens": null
+   },
+   "enemy_hp_bar": {
+    "k": 29,
+    "n": 32,
+    "acc": 0.90625,
+    "ci": [
+     0.7578150066422116,
+     0.9675990373736805
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 4.4,
+    "median_out_tokens": null
+   },
+   "facing": {
+    "k": 22,
+    "n": 36,
+    "acc": 0.6111111111111112,
+    "ci": [
+     0.4486417029674347,
+     0.7521534458217705
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 13.0,
+    "median_out_tokens": null
+   },
+   "npc_count": {
+    "k": 30,
+    "n": 36,
+    "acc": 0.8333333333333334,
+    "ci": [
+     0.6810888526532568,
+     0.9212965937143589
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 6.5,
+    "median_out_tokens": null
+   },
+   "walkable": {
+    "k": 31,
+    "n": 36,
+    "acc": 0.8611111111111112,
+    "ci": [
+     0.7134014871960681,
+     0.9391827463688489
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 6.4,
+    "median_out_tokens": null
+   },
+   "place": {
+    "k": 26,
+    "n": 35,
+    "acc": 0.7428571428571429,
+    "ci": [
+     0.5793037572935127,
+     0.8583713127344985
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 6.7,
+    "median_out_tokens": null
+   }
+  },
+  "n_rows": 337,
+  "macro": 0.8810218253968254,
+  "groups": {
+   "reading": 0.971111111111111,
+   "graphics": 0.7835648148148149,
+   "scene": 0.801984126984127
+  },
+  "micro": [
+   295,
+   337
+  ]
+ },
  "openrouter_tencent_hy4-flash": {
   "file": "openrouter_tencent_hy4-flash.jsonl",
   "cats": {
@@ -1666,6 +2000,173 @@
   },
   "micro": [
    222,
+   337
+  ]
+ },
+ "openrouter_thinkingmachines_inkling-2-small-free": {
+  "file": "openrouter_thinkingmachines_inkling-2-small-free.jsonl",
+  "cats": {
+   "text": {
+    "k": 35,
+    "n": 36,
+    "acc": 0.9722222222222222,
+    "ci": [
+     0.8582996626496918,
+     0.9950797197044302
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 12.7,
+    "median_out_tokens": null,
+    "mean_cer": 0.000992063492063492
+   },
+   "cursor": {
+    "k": 36,
+    "n": 36,
+    "acc": 1.0,
+    "ci": [
+     0.9035781695514236,
+     1.0
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 3.6,
+    "median_out_tokens": null
+   },
+   "enemy_name": {
+    "k": 30,
+    "n": 30,
+    "acc": 1.0,
+    "ci": [
+     0.8864829086095221,
+     1.0
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 4.8,
+    "median_out_tokens": null
+   },
+   "enemy_level": {
+    "k": 30,
+    "n": 30,
+    "acc": 1.0,
+    "ci": [
+     0.8864829086095221,
+     1.0
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 5.4,
+    "median_out_tokens": null
+   },
+   "player_hp": {
+    "k": 30,
+    "n": 30,
+    "acc": 1.0,
+    "ci": [
+     0.8864829086095221,
+     1.0
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 5.9,
+    "median_out_tokens": null
+   },
+   "enemy_hp_bar": {
+    "k": 30,
+    "n": 32,
+    "acc": 0.9375,
+    "ci": [
+     0.7985253275199642,
+     0.9826897968048427
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 9.9,
+    "median_out_tokens": null
+   },
+   "facing": {
+    "k": 23,
+    "n": 36,
+    "acc": 0.6388888888888888,
+    "ci": [
+     0.4757478039083198,
+     0.7752461320781867
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 26.1,
+    "median_out_tokens": null
+   },
+   "npc_count": {
+    "k": 33,
+    "n": 36,
+    "acc": 0.9166666666666666,
+    "ci": [
+     0.7817298972308114,
+     0.9712519107287082
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 29.9,
+    "median_out_tokens": null
+   },
+   "walkable": {
+    "k": 29,
+    "n": 36,
+    "acc": 0.8055555555555556,
+    "ci": [
+     0.6497163793648479,
+     0.9024702798054665
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 23.6,
+    "median_out_tokens": null
+   },
+   "place": {
+    "k": 25,
+    "n": 35,
+    "acc": 0.7142857142857143,
+    "ci": [
+     0.5494475193017891,
+     0.8367363660170444
+    ],
+    "missing": 0,
+    "errors": 0,
+    "invalid": 0,
+    "no_final": 0,
+    "median_s": 32.9,
+    "median_out_tokens": null
+   }
+  },
+  "n_rows": 337,
+  "macro": 0.8985119047619048,
+  "groups": {
+   "reading": 0.9944444444444445,
+   "graphics": 0.8310185185185185,
+   "scene": 0.7599206349206349
+  },
+  "micro": [
+   301,
    337
   ]
  }
